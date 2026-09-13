@@ -1,0 +1,11 @@
+{
+  "autodeskProduct": "Fusion",
+  "type": "addin",
+  "author": "FCOH prototype",
+  "id": "a80e5f18-ffdf-46aa-bc19-7927b79664ae",
+  "description": {"": "Generate NEW parts from local FCOH prototype jobs. No listening network port."},
+  "version": "0.1.1",
+  "supportedOS": "windows",
+  "editEnabled": true,
+  "runOnStartup": true
+}

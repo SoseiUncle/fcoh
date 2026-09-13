@@ -1,0 +1,50 @@
+fcoh: '0.3'
+meta:
+  id: MountingBracket
+  name: 取付ブラケット
+  units: mm
+  description: 80×40×6 mmの底板、高さ30 mmの背面壁、直径6 mmの取付穴4個。
+source: null
+params:
+  length: {value: 80, unit: mm, meaning: 底板の長さ}
+  width: {value: 40, unit: mm, meaning: 底板の幅}
+  thickness: {value: 6, unit: mm, meaning: 底板と背面壁の肉厚}
+  wall_y: {value: 34, unit: mm, meaning: 背面壁の手前位置}
+  wall_height: {value: 24, unit: mm, meaning: 底板上面からの高さ}
+  hole_radius: {value: 3, unit: mm, meaning: M5ボルト用クリアランス穴の半径}
+  left_x: {value: 12, unit: mm, meaning: 左穴の中心位置}
+  right_x: {value: 68, unit: mm, meaning: 右穴の中心位置}
+  front_y: {value: 12, unit: mm, meaning: 手前の穴中心位置}
+  rear_y: {value: 26, unit: mm, meaning: 奥の穴中心位置}
+datums:
+  - {id: base_plane, kind: plane, plane: XY, offset: 0, meaning: 取付相手に接する底面}
+  - {id: top_plane, kind: plane, plane: XY, offset: thickness, meaning: 底板上面}
+steps:
+  - id: base_sketch
+    kind: sketch
+    datum: base_plane
+    entities:
+      - {id: base_outline, kind: rectangle, x: 0, y: 0, width: length, height: width, meaning: 底板の外形}
+    meaning: 底板輪郭
+    why: 取付面積を確保する
+  - {id: base_pad, kind: pad, sketch: base_sketch, distance: thickness, meaning: 底板, why: 必要な肉厚を持たせる}
+  - id: wall_sketch
+    kind: sketch
+    datum: top_plane
+    entities:
+      - {id: wall_outline, kind: rectangle, x: 0, y: wall_y, width: length, height: thickness, meaning: 背面壁断面}
+    meaning: 背面壁輪郭
+    why: 底板と連結した立ち上がりを作る
+  - {id: wall_pad, kind: pad, sketch: wall_sketch, distance: wall_height, meaning: 背面壁, why: 相手部品を支持する}
+  - id: holes_sketch
+    kind: sketch
+    datum: top_plane
+    entities:
+      - {id: hole_fl, kind: circle, x: left_x, y: front_y, radius: hole_radius, meaning: 左手前の取付穴}
+      - {id: hole_fr, kind: circle, x: right_x, y: front_y, radius: hole_radius, meaning: 右手前の取付穴}
+      - {id: hole_rl, kind: circle, x: left_x, y: rear_y, radius: hole_radius, meaning: 左奥の取付穴}
+      - {id: hole_rr, kind: circle, x: right_x, y: rear_y, radius: hole_radius, meaning: 右奥の取付穴}
+    meaning: ボルト穴の配置
+    why: 底板を4本のボルトで固定する
+  - {id: mounting_holes, kind: pocket, sketch: holes_sketch, distance: thickness, meaning: 4個の貫通穴, why: 底板の厚さ分を下向きに切削する}
+recipe: null

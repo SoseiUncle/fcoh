@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.runtime/
+outputs/
+downloads/
+vendor/
+evidence/
+STATUS.md
+dist/
+*.egg-info/
+.env
+.env.*
