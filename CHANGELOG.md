@@ -1,20 +1,29 @@
-# Changelog
+# 変更履歴
 
 ## 0.1.0 — 2026-09-13
 
-Initial experimental source release. Free, unsupported OSS under the MIT License.
+初回の実験版ソースコード公開です。MITライセンスの無料OSSとして提供します。
+現状有姿での提供となり、保証、個別サポート、返信、修正、継続保守の約束はありません。
 
-- Human/LLM-readable FCOH 0.3 subset in YAML, with schema and semantic validation.
-- Named dimensions, design intent (`meaning` / `why`) and ordered operations.
-- New single-solid part generation using FreeCAD and Autodesk Fusion native APIs.
-- Local stdio MCP: capabilities, validate, build and status.
-- Isolated per-job outputs: native CAD, STEP, source YAML and result metadata.
-- Mounting-bracket example, setup scripts and reproducible validation scripts.
-- Real sample validation on both CADs, including native reopen and STEP shape comparison.
+- 人間とLLMが読みやすいYAMLで、FCOH形式0.3の一部を実装。スキーマと意味上の整合性を検証します。
+- 名前付き寸法、設計意図（`meaning` / `why`）、操作順序を記録します。
+- FreeCADとAutodesk FusionのネイティブAPIで、単一ソリッドの部品を新規生成します。
+- ローカルstdio MCPで、対応状況の確認、入力検証、部品生成、実行結果の取得に対応します。
+- ジョブごとの専用フォルダに、ネイティブCAD、STEP、入力YAML、結果メタデータを保存します。
+- 取付ブラケットのサンプル、セットアップスクリプト、再現用の検証スクリプトを収録しました。
+- 両CADでサンプルを実機検証し、ネイティブ形式の再読込とSTEP形状比較を確認しました。
 
-Supported: millimetres, XY planes with Z offsets, rectangles/circles, +Z pads and -Z pockets.
-Not supported: existing CAD history extraction, STEP/STL input, complete round trips,
-fillets, chamfers, general sketch constraints, assemblies or CAD edits written back to YAML.
+## 対応範囲
 
-Use a source checkout on Windows x64. This is not a standalone wheel/PyPI release.
-Third-party CAD applications and dependencies retain their own licenses and requirements.
+- 単位mm、XY基準面とZオフセット。
+- 矩形・円のスケッチ、+Z方向の押し出し、-Z方向のポケット。
+
+既存CADの履歴抽出、STEP/STL入力、完全な往復変換、フィレット、面取り、
+一般的なスケッチ拘束、アセンブリ、CAD内の編集結果のYAMLへの書き戻しには対応していません。
+
+## 利用上の注意
+
+Windows x64で、リポジトリを取得して使用してください。単体wheel・PyPI配布には対応していません。
+ソフトウェアの版番号は0.1.0、実装しているFCOH形式の版番号は0.3です。
+第三者のCADアプリケーションと依存パッケージには、それぞれのライセンスと利用条件が適用されます。
+Fusion本体は同梱せず、その利用権や無償利用を提供するものではありません。
