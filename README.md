@@ -1,6 +1,6 @@
 # FCOH — Feature-Centric Operation History
 
-**v0.1.0 / Experimental preview / MIT License / 無料・サポート保証なし**
+**v0.1.0 / Experimental preview / MIT License **
 
 FCOH（Feature-Centric Operation History）形式0.3の最小試作です。
 設計意図つきYAMLから、新しい部品をFreeCADまたはFusionで作ります。
