@@ -12,6 +12,7 @@ def main():
     sub.add_parser('capabilities')
     validate = sub.add_parser('validate')
     validate.add_argument('file')
+    validate.add_argument('--strict', action='store_true', help='Fail if pre-CAD lint reports errors')
     create = sub.add_parser('build')
     create.add_argument('file')
     create.add_argument('--cad', choices=['freecad', 'fusion'], default='freecad')
@@ -23,7 +24,7 @@ def main():
         if args.command == 'capabilities':
             result = capabilities()
         elif args.command == 'validate':
-            result = describe(args.file)
+            result = describe(args.file, strict=args.strict)
         elif args.command == 'status':
             result = status(args.job_id)
         else:

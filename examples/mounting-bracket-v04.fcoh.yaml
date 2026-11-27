@@ -1,0 +1,70 @@
+fcoh: '0.4'
+meta:
+  id: MountingBracketV04
+  name: 取付ブラケット v0.4
+  units: mm
+  description: 数式パラメータ連動、面参照基準面、貫通穴、セマンティック参照による根元フィレット・面取りを備えたブラケット。
+source: null
+params:
+  length: {value: 80, min: 45, max: 300, unit: mm, meaning: 底板の長さ}
+  width: {value: 40, min: 30, max: 200, unit: mm, meaning: 底板の幅}
+  thickness: {value: 6, min: 3, max: 20, unit: mm, meaning: 底板と背面壁の肉厚}
+  wall_height: {value: 24, min: 10, max: 120, unit: mm, meaning: 底板上面からの背面壁高さ}
+  edge_margin: {value: 12, min: 6, max: 30, unit: mm, meaning: 左右・手前端面からボルト穴中心までの距離}
+  hole_radius: {value: 3, min: 1.5, max: 8, unit: mm, meaning: M5ボルト用クリアランス穴の半径}
+  wall_y: {value: "width - thickness", unit: mm, meaning: 背面壁の手前位置（幅と肉厚に連動）}
+  right_x: {value: "length - edge_margin", unit: mm, meaning: 右穴の中心X位置（長さ変更に追従）}
+  rear_y: {value: "wall_y - 8", unit: mm, meaning: 奥穴の中心Y位置（背面壁との干渉を回避）}
+  root_fillet: {value: "min(thickness / 2, 3)", min: 0.5, max: 6, unit: mm, meaning: 根元フィレット半径（肉厚の半分または3mmの小さい方）}
+  top_chamfer: {value: 1.0, min: 0.2, max: 2.5, unit: mm, meaning: 背面壁上端の角落とし面取り量}
+  hole_chamfer: {value: 0.6, min: 0.2, max: 1.5, unit: mm, meaning: ボルト挿入ガイド用の上面穴面取り量}
+datums:
+  - {id: base_plane, kind: plane, plane: XY, offset: 0, meaning: 取付相手に接する底面}
+  - {id: top_plane, kind: face_plane, face: {of: base_pad, side: "+Z"}, offset: 0, meaning: 底板の上面（base_padの+Z面を動的に参照）}
+steps:
+  - id: base_sketch
+    kind: sketch
+    datum: base_plane
+    entities:
+      - {id: base_outline, kind: rectangle, x: 0, y: 0, width: length, height: width, meaning: 底板の外形}
+    meaning: 底板輪郭
+    why: 取付面積を確保する
+  - {id: base_pad, kind: pad, sketch: base_sketch, distance: thickness, meaning: 底板, why: 必要な肉厚を持たせる}
+  - id: wall_sketch
+    kind: sketch
+    datum: top_plane
+    entities:
+      - {id: wall_outline, kind: rectangle, x: 0, y: wall_y, width: length, height: thickness, meaning: 背面壁断面}
+    meaning: 背面壁輪郭
+    why: 底板後端に連結した立ち上がりを作る
+  - {id: wall_pad, kind: pad, sketch: wall_sketch, distance: wall_height, meaning: 背面壁, why: 相手部品を支持する}
+  - id: holes_sketch
+    kind: sketch
+    datum: top_plane
+    entities:
+      - {id: hole_fl, kind: circle, x: edge_margin, y: edge_margin, radius: hole_radius, meaning: 左手前の取付穴}
+      - {id: hole_fr, kind: circle, x: right_x, y: edge_margin, radius: hole_radius, meaning: 右手前の取付穴}
+      - {id: hole_rl, kind: circle, x: edge_margin, y: rear_y, radius: hole_radius, meaning: 左奥の取付穴}
+      - {id: hole_rr, kind: circle, x: right_x, y: rear_y, radius: hole_radius, meaning: 右奥の取付穴}
+    meaning: ボルト穴の配置
+    why: 底板を4本のボルトで固定する
+  - {id: mounting_holes, kind: pocket, sketch: holes_sketch, through_all: true, meaning: 4個の貫通穴, why: 板厚が変わっても必ず貫通させる}
+  - id: root_fillet_feat
+    kind: fillet
+    edges: {between: [base_pad, wall_pad], convexity: concave}
+    radius: root_fillet
+    meaning: 根元フィレット
+    why: 底板と背面壁の付け根の応力集中を緩和する
+  - id: wall_top_chamfer
+    kind: chamfer
+    edges: {of: wall_pad, side: "+Z", orientation: X, convexity: convex}
+    size: top_chamfer
+    meaning: 背面壁上端の面取り
+    why: 作業者が触れる上端の鋭利なエッジを落とす
+  - id: hole_lead_chamfer
+    kind: chamfer
+    edges: {of: mounting_holes, side: "+Z", kind: circle}
+    size: hole_chamfer
+    meaning: ボルト穴上面のC面取り
+    why: M5ボルトを挿入しやすくしバリを取る
+recipe: null

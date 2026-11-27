@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FCOH 0.4 experimental prototype subset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fcoh", "meta", "source", "params", "datums", "steps", "recipe"],
+  "properties": {
+    "fcoh": {"const": "0.4"},
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "units"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "name": {"type": "string", "minLength": 1},
+        "units": {"const": "mm"},
+        "description": {"type": ["string", "null"]}
+      }
+    },
+    "source": {
+      "type": "null",
+      "description": "This new-part generator does not import external geometry yet."
+    },
+    "recipe": {
+      "type": "null",
+      "description": "Executable recipes are intentionally unsupported."
+    },
+    "params": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 100,
+      "propertyNames": {"$ref": "#/$defs/id"},
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["value", "unit", "meaning"],
+        "properties": {
+          "value": {"$ref": "#/$defs/dimension"},
+          "unit": {"const": "mm"},
+          "min": {"$ref": "#/$defs/dimension"},
+          "max": {"$ref": "#/$defs/dimension"},
+          "meaning": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "datums": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/datum_plane"},
+          {"$ref": "#/$defs/datum_face_plane"}
+        ]
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/sketch"},
+          {"$ref": "#/$defs/pad"},
+          {"$ref": "#/$defs/pocket"},
+          {"$ref": "#/$defs/fillet"},
+          {"$ref": "#/$defs/chamfer"}
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+    "expr": {"type": "string", "minLength": 1, "maxLength": 128},
+    "dimension": {
+      "oneOf": [
+        {"type": "number", "minimum": -10000, "maximum": 10000},
+        {"$ref": "#/$defs/expr"}
+      ]
+    },
+    "side": {"enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
+    "face_selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["of", "side"],
+      "properties": {
+        "of": {"$ref": "#/$defs/id"},
+        "side": {"$ref": "#/$defs/side"}
+      }
+    },
+    "edge_selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "between": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "of": {"$ref": "#/$defs/id"},
+        "side": {"$ref": "#/$defs/side"},
+        "orientation": {"enum": ["X", "Y", "Z"]},
+        "convexity": {"enum": ["convex", "concave", "any"]},
+        "kind": {"enum": ["line", "circle"]}
+      },
+      "anyOf": [
+        {"required": ["between"]},
+        {"required": ["of"]}
+      ]
+    },
+    "datum_plane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "plane", "offset", "meaning"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"const": "plane"},
+        "plane": {"enum": ["XY", "XZ", "YZ"]},
+        "offset": {"$ref": "#/$defs/dimension"},
+        "meaning": {"type": ["string", "null"]}
+      }
+    },
+    "datum_face_plane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "face", "meaning"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"const": "face_plane"},
+        "face": {"$ref": "#/$defs/face_selector"},
+        "offset": {"$ref": "#/$defs/dimension"},
+        "meaning": {"type": ["string", "null"]}
+      }
+    },
+    "entity": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "kind", "x", "y", "width", "height", "meaning"],
+          "properties": {
+            "id": {"$ref": "#/$defs/id"},
+            "kind": {"const": "rectangle"},
+            "x": {"$ref": "#/$defs/dimension"},
+            "y": {"$ref": "#/$defs/dimension"},
+            "width": {"$ref": "#/$defs/dimension"},
+            "height": {"$ref": "#/$defs/dimension"},
+            "meaning": {"type": ["string", "null"]}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "kind", "x", "y", "radius", "meaning"],
+          "properties": {
+            "id": {"$ref": "#/$defs/id"},
+            "kind": {"const": "circle"},
+            "x": {"$ref": "#/$defs/dimension"},
+            "y": {"$ref": "#/$defs/dimension"},
+            "radius": {"$ref": "#/$defs/dimension"},
+            "meaning": {"type": ["string", "null"]}
+          }
+        }
+      ]
+    },
+    "sketch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "datum", "entities", "meaning", "why"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"const": "sketch"},
+        "datum": {"$ref": "#/$defs/id"},
+        "entities": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {"$ref": "#/$defs/entity"}
+        },
+        "meaning": {"type": ["string", "null"]},
+        "why": {"type": ["string", "null"]}
+      }
+    },
+    "pad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "sketch", "distance", "meaning", "why"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"const": "pad"},
+        "sketch": {"$ref": "#/$defs/id"},
+        "distance": {"$ref": "#/$defs/dimension"},
+        "direction": {"enum": ["normal", "reverse"]},
+        "meaning": {"type": ["string", "null"]},
+        "why": {"type": ["string", "null"]}
+      }
+    },
+    "pocket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "sketch", "meaning", "why"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"const": "pocket"},
+        "sketch": {"$ref": "#/$defs/id"},
+        "distance": {"$ref": "#/$defs/dimension"},
+        "through_all": {"type": "boolean"},
+        "direction": {"enum": ["reverse", "normal"]},
+        "meaning": {"type": ["string", "null"]},
+        "why": {"type": ["string", "null"]}
+      },
+      "oneOf": [
+        {"required": ["distance"], "not": {"properties": {"through_all": {"const": true}}, "required": ["through_all"]}},
+        {"properties": {"through_all": {"const": true}}, "required": ["through_all"], "not": {"required": ["distance"]}}
+      ]
+    },
+    "fillet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "edges", "radius", "meaning", "why"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"const": "fillet"},
+        "edges": {"$ref": "#/$defs/edge_selector"},
+        "radius": {"$ref": "#/$defs/dimension"},
+        "meaning": {"type": ["string", "null"]},
+        "why": {"type": ["string", "null"]}
+      }
+    },
+    "chamfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "edges", "size", "meaning", "why"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"const": "chamfer"},
+        "edges": {"$ref": "#/$defs/edge_selector"},
+        "size": {"$ref": "#/$defs/dimension"},
+        "meaning": {"type": ["string", "null"]},
+        "why": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

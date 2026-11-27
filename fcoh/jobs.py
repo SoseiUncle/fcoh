@@ -48,12 +48,15 @@ def capabilities():
                 fusion['last_main_thread_state'] = json.loads(state_file.read_text(encoding='utf-8'))
             except (ValueError, OSError):
                 pass
-    return {'format': 'FCOH 0.3 prototype subset', 'units': ['mm'],
-            'steps': ['sketch:rectangle', 'sketch:circle', 'pad:+Z', 'pocket:-Z'],
+    return {'format': 'FCOH 0.3 / 0.4 experimental subset', 'versions': ['0.3', '0.4'], 'units': ['mm'],
+            'datums': ['plane:XY', 'plane:XZ', 'plane:YZ', 'face_plane'],
+            'steps': ['sketch:rectangle', 'sketch:circle', 'pad', 'pocket', 'pocket:through_all',
+                      'fillet:semantic_edges', 'chamfer:semantic_edges'],
+            'expressions': ['+', '-', '*', '/', 'min', 'max', 'abs'],
             'freecad_installed': bool(list((ROOT / 'vendor').glob('FreeCAD*/bin/python.exe'))),
             'fusion': fusion, 'transport': 'stdio', 'root': str(ROOT),
-            'limits': ['new single solid parts only', 'XY planes only', 'no STEP/STL import yet',
-                       'no fillets, assemblies, or full history conversion', 'geometry regenerated from YAML']}
+            'limits': ['new single solid parts only', 'no STEP/STL import yet',
+                       'no freeform surfaces/lofts or assemblies yet', 'geometry regenerated from YAML']}
 
 
 def build(path, cad='freecad'):
