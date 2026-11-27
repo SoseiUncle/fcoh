@@ -22,9 +22,9 @@ def fcoh_capabilities() -> dict:
 
 
 @mcp.tool()
-def fcoh_validate(file: str) -> dict:
-    """Validate a project-relative .fcoh.yaml file without creating a CAD document."""
-    return expected_errors(describe, file)
+def fcoh_validate(file: str, strict: bool = False) -> dict:
+    """Validate a project-relative .fcoh.yaml file, resolve expressions, and run pre-CAD lint checks."""
+    return expected_errors(describe, file, strict)
 
 
 @mcp.tool()
